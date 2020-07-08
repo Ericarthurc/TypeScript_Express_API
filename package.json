@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "dev": "concurrently \"nodemon server.ts\" \"cd frontend && npm start\"",
+    "dev-react": "concurrently \"nodemon server.ts\" \"cd frontend && npm start\"",
+    "dev": "nodemon server.ts",
     "prestart": "npm i && cd frontend && npm i && npm run build",
     "start": "cross-env NODE_ENV=production ts-node server.ts"
   },
