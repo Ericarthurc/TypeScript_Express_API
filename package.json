@@ -4,12 +4,12 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "dev-react": "concurrently \"nodemon server.ts\" \"cd frontend && npm start\"",
+    "dev-react": "concurrently \"nodemon server.ts\" \"cd frontend && yarn start\"",
     "dev": "nodemon server.ts",
-    "prestart": "npm i && cd frontend && npm i && npm run build",
+    "prestart": "yarn install && cd frontend && yarn install && yarn run build",
     "start": "cross-env NODE_ENV=production ts-node server.ts"
   },
-  "author": "",
+  "author": "Eric Christensen <hebrew.8.12@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -42,5 +42,6 @@
   "devDependencies": {
     "concurrently": "^5.2.0",
     "nodemon": "^2.0.4"
-  }
+  },
+  "repository": "https://github.com/Ericarthurc/Typescript_Express_React.git"
 }
