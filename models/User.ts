@@ -1,9 +1,9 @@
-import mongoose, { Schema } from 'mongoose';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import mongoose, { Schema } from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
-import { IUser, SUser } from '../@types/models';
-import Video from './Video';
+import { IUser, SUser } from "../@types/models";
+import Video from "./Video";
 
 const UserSchema: Schema = new Schema(
   {
@@ -19,8 +19,8 @@ const UserSchema: Schema = new Schema(
       trim: true,
       minlength: 6,
       validate: {
-        validator: (v: IUser['password']) => {
-          return !v.toLowerCase().includes('password');
+        validator: (v: IUser["password"]) => {
+          return !v.toLowerCase().includes("password");
         },
         message: (props) => `${props.value} can't contain 'password`,
       },
@@ -38,10 +38,10 @@ const UserSchema: Schema = new Schema(
 );
 
 // virtual
-UserSchema.virtual('video', {
-  ref: 'Video',
-  localField: '_id',
-  foreignField: 'owner',
+UserSchema.virtual("video", {
+  ref: "Video",
+  localField: "_id",
+  foreignField: "owner",
 });
 
 // custom method that cleans up the object being sent back to the client
@@ -62,7 +62,7 @@ UserSchema.methods.generateAuthToken = async function (this: IUser) {
     { _id: user._id.toString() },
     `${process.env.JWT_SECRET}`,
     {
-      expiresIn: '2d',
+      expiresIn: "2d",
     }
   );
 
@@ -74,32 +74,29 @@ UserSchema.methods.generateAuthToken = async function (this: IUser) {
 
 // statics are availble on the models
 UserSchema.statics.findByCredentials = async (
-  username: IUser['username'],
-  password: IUser['password']
+  username: IUser["username"],
+  password: IUser["password"]
 ) => {
   const user = await User.findOne({ username });
 
   if (!user) {
-    throw new Error('Unable to login');
+    throw new Error("Unable to login");
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
 
-  console.log(password);
-  console.log(user.password);
-
   if (!isMatch) {
-    throw new Error('Unable to login');
+    throw new Error("Unable to login");
   }
 
   return user;
 };
 
 // hook: hash the plain text password before saving
-UserSchema.pre('save', async function (this: IUser, next) {
+UserSchema.pre("save", async function (this: IUser, next) {
   const user = this;
 
-  if (user.isModified('password')) {
+  if (user.isModified("password")) {
     user.password = await bcrypt.hash(user.password, 8);
   }
 
@@ -107,11 +104,11 @@ UserSchema.pre('save', async function (this: IUser, next) {
 });
 
 // hook: delete user video when user is removed
-UserSchema.pre('remove', async function (this: IUser, next) {
+UserSchema.pre("remove", async function (this: IUser, next) {
   const user = this;
   await Video.deleteMany({ owner: user._id });
   next();
 });
 
-const User = mongoose.model<IUser, SUser>('User', UserSchema);
+const User = mongoose.model<IUser, SUser>("User", UserSchema);
 export default User;
