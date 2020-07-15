@@ -4,10 +4,15 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "dev-react": "concurrently \"nodemon server.ts\" \"cd frontend && yarn start\"",
+    "dev-react": "concurrently \"cross-env FRONT_ENV=react nodemon server.ts\" \"cd frontend/react-web/ && yarn start\"",
+    "dev-vue": "concurrently \"cross-env FRONT_ENV=vue nodemon server.ts\" \"cd frontend/vue-web && yarn serve\"",
     "dev": "nodemon server.ts",
-    "prestart": "yarn install && cd frontend && yarn install && yarn run build",
-    "start": "cross-env NODE_ENV=production ts-node server.ts"
+    "prestart-react": "yarn install && cd frontend/react-web && yarn install && yarn run build",
+    "start-react": "cross-env NODE_ENV=production FRONT_ENV=react ts-node server.ts",
+    "prestart-vue": "yarn install && cd frontend/vue-web && yarn install && yarn run build",
+    "start-vue": "cross-env NODE_ENV=production FRONT_ENV=vue ts-node server.ts",
+    "prestart-api": "yarn install",
+    "start-api": "cross-env NODE_ENV=production ts-node server.ts"
   },
   "author": "Eric Christensen <hebrew.8.12@gmail.com>",
   "license": "ISC",
