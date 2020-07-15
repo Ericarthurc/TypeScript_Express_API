@@ -1,6 +1,13 @@
 <template>
   <div>
     <h1>Login Vue</h1>
+    {{ store.state.count }}
+    {{ store.state.loggedIn }}
+    <div v-if="store.state.loggedIn">
+      <p v-for="i in user" :key="i._id">{{ i.username }} {{ i.password }}</p>
+    </div>
+
+    <button @click="increment()">+</button>
     <input
       type="text"
       name="username"
@@ -13,14 +20,15 @@
       v-model="input.password"
       placeholder="Password"
     />
-    <button type="button" v-on:click="login()">Login</button>
-    <button type="button" v-on:click="getMe()">GetMe</button>
+    <button type="button" @click="login()">Login</button>
+    <button type="button" @click="getMe()">GetMe</button>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { reactive, computed, onBeforeMount, ref } from 'vue';
 // import axios from 'axios';
+import { useStore } from 'vuex';
 
 export default {
   setup() {
@@ -29,18 +37,18 @@ export default {
       password: '',
     });
 
-    async function login() {
-      const response = await fetch('/api/v1/users/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: input.username,
-          password: input.password,
-        }),
+    const store = useStore();
+    const user = ref(store.loggedUser);
+
+    function login() {
+      store.dispatch('loginHandler', {
+        username: input.username,
+        password: input.password,
       });
-      console.log(await response.json());
+    }
+
+    function increment() {
+      store.commit('increment');
     }
 
     async function getMe() {
@@ -50,17 +58,17 @@ export default {
       console.log(await response.json());
     }
 
-    // onBeforeMount(async () => {
-    //   const users = await axios.get(`/api/v1/users`);
-    //   console.log(users);
-    //   usersDatabase.value = users.data.data;
-    //   isLoaded.value = true;
-    // });
+    onBeforeMount(() => {
+      store.dispatch('alreadyLoggedHandler');
+    });
 
     return {
       input,
       login,
       getMe,
+      store,
+      increment,
+      user,
     };
   },
 };
