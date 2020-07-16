@@ -1,18 +1,29 @@
 <template>
-  <div id="app">
+  <div v-if="store.state.userAPI.loggedIn === null" id="app"></div>
+  <div v-else>
     <img alt="Vue logo" src="./assets/logo.png" />
-    <Login />
+    <router-view />
   </div>
 </template>
 
 <script>
-import Login from './components/Login.vue';
+import { onBeforeMount, ref } from "vue";
+import { useStore } from "vuex";
 
 export default {
-  name: 'App',
-  components: {
-    Login,
-  },
+  name: "App",
+  setup() {
+    const store = useStore();
+
+    onBeforeMount(async () => {
+      console.log(["BEFORE MOUNT"]);
+      await store.dispatch("userAPI/alreadyLoggedHandler");
+    });
+
+    return {
+      store
+    };
+  }
 };
 </script>
 
@@ -30,14 +41,15 @@ html {
 }
 
 body {
+  margin: 0;
+  padding: 0;
   background: #bada55;
+  text-align: center;
 }
 
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+p {
+  margin: 0;
+  padding: 0;
+  display: block;
 }
 </style>

@@ -1,10 +1,11 @@
 // vue.config.js;
 module.exports = {
-  outputDir: 'build',
+  outputDir: "build",
   devServer: {
+    open: "Google Chrome",
     proxy: {
-      '/': {
-        target: 'http://localhost:3010',
+      "/api": {
+        target: "http://localhost:3010",
       },
     },
   },

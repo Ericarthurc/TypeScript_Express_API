@@ -1,5 +1,5 @@
-import express from 'express';
-import User from '../models/User';
+import express from "express";
+import User from "../models/User";
 
 // @desc    Get all users
 // @route   GET /api/v1/users
@@ -41,7 +41,24 @@ export const createUser = async (
     const user = await User.create(req.body);
     const token = await user.generateAuthToken();
 
-    res.status(201).json({ success: true, data: user, token });
+    let options = {};
+    if (process.env.NODE_ENV === "development") {
+      options = {
+        secure: false,
+      };
+    } else if (process.env.NODE_ENV === "production") {
+      options = {
+        secure: true,
+      };
+    }
+
+    res.cookie("authToken", token, {
+      maxAge: 48 * 60 * 60 * 1000,
+      httpOnly: true,
+      ...options,
+    });
+
+    res.status(201).json({ success: true, data: user });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
@@ -64,27 +81,27 @@ export const loginUser = async (
     const token = await user.generateAuthToken();
 
     let options = {};
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       options = {
         secure: false,
       };
-    } else if (process.env.NODE_ENV === 'production') {
+    } else if (process.env.NODE_ENV === "production") {
       options = {
         secure: true,
       };
     }
 
-    res.cookie('authToken', token, {
+    res.cookie("authToken", token, {
       maxAge: 48 * 60 * 60 * 1000,
       httpOnly: true,
       ...options,
     });
-    res.cookie('loggedIn', 1, {
-      maxAge: 48 * 60 * 60 * 1000,
-      ...options,
-    });
+    // res.cookie('loggedIn', 1, {
+    //   maxAge: 48 * 60 * 60 * 1000,
+    //   ...options,
+    // });
 
-    res.status(200).json({ success: true, user, token });
+    res.status(200).json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, error });
   }
@@ -104,8 +121,8 @@ export const logoutUser = async (
     });
     await req.user.save();
 
-    res.clearCookie('authToken');
-    res.clearCookie('loggedIn');
+    res.clearCookie("authToken");
+    res.clearCookie("loggedIn");
     res.status(200).json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error });
@@ -121,13 +138,13 @@ export const updateUser = async (
   next: express.NextFunction
 ) => {
   const updates = Object.keys(req.body);
-  const allowedUpdates = ['username', 'password'];
+  const allowedUpdates = ["username", "password"];
   const isValidOperation = updates.every((update) =>
     allowedUpdates.includes(update)
   );
 
   if (!isValidOperation) {
-    throw new Error('Invalid updates!');
+    throw new Error("Invalid updates!");
   }
 
   try {

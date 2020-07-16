@@ -49,7 +49,7 @@ UserSchema.methods.toJSON = function (this: IUser) {
   const user = this;
   const userObject = user.toObject();
 
-  // delete userObject.password;
+  delete userObject.password;
   delete userObject.tokens;
 
   return userObject;
